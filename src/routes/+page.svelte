@@ -7,18 +7,19 @@
   import debounce from 'lodash.debounce';
   import { readText } from '@tauri-apps/plugin-clipboard-manager';
   import { type Edge, type Data as VisData, type Node } from 'vis-network';
+  import { Pane, Splitpanes } from 'svelte-splitpanes';
 
   initializePest();
 
   let leftPanel: monaco.editor.IStandaloneCodeEditor | undefined = $state(undefined);
   let rightPanel: monaco.editor.IStandaloneCodeEditor | undefined = $state(undefined);
-
   let networkData: VisData = $state({});
 
   let rules: string[] = $state([]);
   let selectedRule = $state('');
   let grammar = $state('');
   let input = $state('');
+  let grammarUpdate = $state(0);
 
   const updateGrammar = debounce((grammar: string) => {
     commands.updatePestGrammar(grammar).then((v) => {
@@ -48,11 +49,12 @@
         if (model) {
           monaco.editor.setModelMarkers(model, 'pest-rs', []);
         }
+        ++grammarUpdate;
       }
     });
   }, 500);
 
-  const parseInput = debounce((input: string, rule: string) => {
+  const parseInput = debounce((input: string, rule: string, _: number) => {
     commands.parseInput(input, rule).then((v) => {
       if (v.status === 'error') {
         const model = rightPanel?.getModel();
@@ -134,40 +136,6 @@
     return [node, data];
   }
 
-  function onPasted(editor: monaco.editor.IStandaloneCodeEditor) {
-    editor.onDidPaste(async (e) => {
-      const clipboardContent = await readText();
-      editor.executeEdits('pest-rs', [
-        {
-          range: e.range,
-          text: clipboardContent,
-        },
-      ]);
-    });
-  }
-
-  $effect(() => {
-    if (leftPanel) {
-      leftPanel
-        .getModel()
-        ?.onDidChangeContent(
-          () => (grammar = leftPanel?.getModel()?.getLinesContent().join('\n') ?? ''),
-        );
-      onPasted(leftPanel);
-    }
-  });
-
-  $effect(() => {
-    if (rightPanel) {
-      rightPanel
-        .getModel()
-        ?.onDidChangeContent(
-          () => (input = rightPanel?.getModel()?.getLinesContent().join('\n') ?? ''),
-        );
-      onPasted(rightPanel);
-    }
-  });
-
   $effect(() => {
     updateGrammar(grammar);
   });
@@ -177,48 +145,57 @@
       return;
     }
 
-    parseInput(input, selectedRule);
+    parseInput(input, selectedRule, grammarUpdate);
   });
 </script>
 
 <main class="w-screen h-screen flex flex-col">
-  <div class="h-2/3 flex">
-    <Editor
-      bind:editor={leftPanel}
-      settings={{
-        automaticLayout: true,
-        theme: 'vs-dark',
-        language: 'pest-rs',
-      }}
-      class="w-1/2 h-full"
-    />
-    <Editor
-      bind:editor={rightPanel}
-      settings={{
-        automaticLayout: true,
-        theme: 'vs-dark',
-      }}
-      class="w-1/2 h-full"
-    />
-  </div>
+  <Splitpanes horizontal={true}>
+    <Pane>
+      <Splitpanes>
+        <Pane>
+          <Editor
+            class="w-full h-full"
+            bind:editor={leftPanel}
+            bind:content={grammar}
+            settings={{
+              automaticLayout: true,
+              theme: 'vs-dark',
+              language: 'pest-rs',
+            }}
+          />
+        </Pane>
+        <Pane>
+          <Editor
+            bind:editor={rightPanel}
+            bind:content={input}
+            settings={{
+              automaticLayout: true,
+              theme: 'vs-dark',
+            }}
+            class="w-full h-full"
+          />
+        </Pane>
+      </Splitpanes>
+    </Pane>
+    <Pane class="relative">
+      <select bind:value={selectedRule} class="w-36 z-1 border">
+        {#each rules as rule}
+          <option value={rule}>{rule}</option>
+        {/each}
+      </select>
 
-  <div class="h-1/3 flex flex-col w-full">
-    <select bind:value={selectedRule}>
-      {#each rules as rule}
-        <option value={rule}>{rule}</option>
-      {/each}
-    </select>
-
-    <Network
-      class="w-full h-full"
-      bind:data={networkData}
-      options={{
-        layout: {
-          hierarchical: {
-            direction: 'UD',
+      <Network
+        class="w-full h-full"
+        bind:data={networkData}
+        options={{
+          layout: {
+            hierarchical: {
+              direction: 'UD',
+            },
           },
-        },
-      }}
-    />
-  </div>
+        }}
+      />
+    </Pane>
+  </Splitpanes>
 </main>

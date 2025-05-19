@@ -20,6 +20,7 @@
     "@tauri-apps/plugin-store": "~2.2.0",
     "lodash.debounce": "^4.0.8",
     "monaco-editor": "^0.52.2",
+    "svelte-splitpanes": "^8.0.9",
     "tailwindcss": "^4.1.7",
     "vis-network": "^9.1.10"
   },

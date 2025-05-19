@@ -7,19 +7,13 @@
     ...props
   }: { class?: string; data?: Data; options?: Options } = $props();
 
-  let element: HTMLDivElement | undefined = undefined;
-  let network: Network | undefined = undefined;
+  let element: HTMLDivElement;
 
   $effect(() => {
-    if (!element) {
-       return;
-    }
-
-    if (network) {
+    const network = new Network(element, data, options);
+    return () => {
       network.destroy();
-    }
-
-    network = new Network(element, data, options);
+    };
   });
 </script>
 

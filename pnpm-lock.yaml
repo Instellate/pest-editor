@@ -29,6 +29,9 @@ importers:
       monaco-editor:
         specifier: ^0.52.2
         version: 0.52.2
+      svelte-splitpanes:
+        specifier: ^8.0.9
+        version: 8.0.9(svelte@5.30.2)
       tailwindcss:
         specifier: ^4.1.7
         version: 4.1.7
@@ -644,6 +647,9 @@ packages:
     engines: {node: '>=18'}
     hasBin: true
 
+  esm-env-robust@0.0.3:
+    resolution: {integrity: sha512-90Gnuw2DALOqlL1581VxP3GHPUNHX9U+fQ+8FNcTTFClhY5gEggAAnJ3q1b2Oq23knRsjv8YpNeMRPaMLUymOA==}
+
   esm-env@1.2.2:
     resolution: {integrity: sha512-Epxrv+Nr/CaL4ZcFGPJIYLWFom+YeV1DqMLHJoEd9SYRxNbaFruBwfEX/kkHUJf55j2+TUbmDcmuilbP1TmXHA==}
 
@@ -838,6 +844,11 @@ packages:
     peerDependencies:
       svelte: ^4.0.0 || ^5.0.0-next.0
       typescript: '>=5.0.0'
+
+  svelte-splitpanes@8.0.9:
+    resolution: {integrity: sha512-L3oLXTC99M191FInTXJ/f/2i0welRql1QuVbPaU8iy6nvCR6X9VyjHCsCpLqKGWHwqkWo/AM9CQ1c0nzlb+MkA==}
+    peerDependencies:
+      svelte: ^4.2.19 || ^5.1.0
 
   svelte@5.30.2:
     resolution: {integrity: sha512-zfGFEwwPeILToOxOqQyFq/vc8euXrX2XyoffkBNgn/k8D1nxbLt5+mNaqQBmZF/vVhBGmkY6VmNK18p9Gf0auQ==}
@@ -1375,6 +1386,10 @@ snapshots:
       '@esbuild/win32-ia32': 0.25.4
       '@esbuild/win32-x64': 0.25.4
 
+  esm-env-robust@0.0.3:
+    dependencies:
+      esm-env: 1.2.2
+
   esm-env@1.2.2: {}
 
   esrap@1.4.6:
@@ -1541,6 +1556,11 @@ snapshots:
       typescript: 5.6.3
     transitivePeerDependencies:
       - picomatch
+
+  svelte-splitpanes@8.0.9(svelte@5.30.2):
+    dependencies:
+      esm-env-robust: 0.0.3
+      svelte: 5.30.2
 
   svelte@5.30.2:
     dependencies:
