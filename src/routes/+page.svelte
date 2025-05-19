@@ -2,19 +2,17 @@
   import { commands, type TokenTree } from '$lib/bindings';
   import { initializePest } from '$lib/monaco-pest';
   import Editor from '$lib/Editor.svelte';
+  import Network from '$lib/Network.svelte';
   import * as monaco from 'monaco-editor';
   import debounce from 'lodash.debounce';
   import { readText } from '@tauri-apps/plugin-clipboard-manager';
-  import { Network, type Edge, type Data as VisData, type Node } from 'vis-network';
+  import { type Edge, type Data as VisData, type Node } from 'vis-network';
 
-  monaco.languages.register({ id: 'pest-rs' });
   initializePest();
 
   let leftPanel: monaco.editor.IStandaloneCodeEditor | undefined = $state(undefined);
   let rightPanel: monaco.editor.IStandaloneCodeEditor | undefined = $state(undefined);
 
-  let network: Network | undefined = $state();
-  let networkElement: HTMLDivElement | undefined = $state();
   let networkData: VisData = $state({});
 
   let rules: string[] = $state([]);
@@ -81,26 +79,8 @@
 
           const [_, newData] = createData(v.data, labelCount);
           networkData = newData;
-          if (network) {
-            network.destroy();
-          }
-
-          network = new Network(networkElement!, networkData, {
-            layout: {
-              hierarchical: {
-                direction: 'UD',
-              },
-            },
-          });
         } else {
           networkData = {};
-          network = new Network(networkElement!, networkData, {
-            layout: {
-              hierarchical: {
-                direction: 'UD',
-              },
-            },
-          });
         }
       }
     });
@@ -189,18 +169,6 @@
   });
 
   $effect(() => {
-    if (networkElement && !network) {
-      network = new Network(networkElement, networkData, {
-        layout: {
-          hierarchical: {
-            direction: 'UD',
-          },
-        },
-      });
-    }
-  });
-
-  $effect(() => {
     updateGrammar(grammar);
   });
 
@@ -241,6 +209,16 @@
       {/each}
     </select>
 
-    <div bind:this={networkElement} class="w-full h-full"></div>
+    <Network
+      class="w-full h-full"
+      bind:data={networkData}
+      options={{
+        layout: {
+          hierarchical: {
+            direction: 'UD',
+          },
+        },
+      }}
+    />
   </div>
 </main>
