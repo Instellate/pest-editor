@@ -1,13 +1,14 @@
 <script lang="ts">
+  import '../editor.scss';
   import { commands, type TokenTree } from '$lib/bindings';
   import { initializePest } from '$lib/monaco-pest';
   import Editor from '$lib/Editor.svelte';
   import Network from '$lib/Network.svelte';
   import * as monaco from 'monaco-editor';
   import debounce from 'lodash.debounce';
-  import { readText } from '@tauri-apps/plugin-clipboard-manager';
   import { type Edge, type Data as VisData, type Node } from 'vis-network';
   import { Pane, Splitpanes } from 'svelte-splitpanes';
+  import ArrowDropdown from '$lib/ArrowDropdown.svelte';
 
   initializePest();
 
@@ -117,7 +118,8 @@
       label: tree.label,
       shape: 'text',
       font: {
-        background: '#FFFFFF',
+        background: '#1E1E1E',
+        color: '#FFFFFF',
       },
     };
 
@@ -150,14 +152,14 @@
 </script>
 
 <main class="w-screen h-screen flex flex-col">
-  <Splitpanes horizontal={true}>
+  <Splitpanes horizontal={true} theme="vs-dark">
     <Pane>
-      <Splitpanes>
+      <Splitpanes theme="vs-dark">
         <Pane>
           <Editor
-            class="w-full h-full"
             bind:editor={leftPanel}
             bind:content={grammar}
+            class="w-full h-full"
             settings={{
               automaticLayout: true,
               theme: 'vs-dark',
@@ -169,24 +171,28 @@
           <Editor
             bind:editor={rightPanel}
             bind:content={input}
+            class="w-full h-full"
             settings={{
               automaticLayout: true,
               theme: 'vs-dark',
             }}
-            class="w-full h-full"
           />
         </Pane>
       </Splitpanes>
     </Pane>
-    <Pane class="relative">
-      <select bind:value={selectedRule} class="w-36 z-1 border">
+    <Pane class="relative panel-bg">
+      <ArrowDropdown class="absolute m-1 z-2 pointer-events-none left-30" />
+      <select
+        bind:value={selectedRule}
+        class="w-36 z-1 m-1 px-1 text-white bg-[#1e1e1e] appearance-none select-border rounded-sm absolute"
+      >
         {#each rules as rule}
           <option value={rule}>{rule}</option>
         {/each}
       </select>
 
       <Network
-        class="w-full h-full"
+        class="w-full h-full bg-[#1e1e1e]"
         bind:data={networkData}
         options={{
           layout: {
@@ -199,3 +205,9 @@
     </Pane>
   </Splitpanes>
 </main>
+
+<style>
+  .select-border {
+    border: 1px solid #37373d;
+  }
+</style>
