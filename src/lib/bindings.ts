@@ -20,6 +20,12 @@ async parseInput(input: string, rule: string) : Promise<Result<TokenTree | null,
     if(e instanceof Error) throw e;
     else return { status: "error", error: e  as any };
 }
+},
+async findRuleReferences(ruleName: string) : Promise<Location[] | null> {
+    return await TAURI_INVOKE("find_rule_references", { ruleName });
+},
+async getAllRules() : Promise<string[]> {
+    return await TAURI_INVOKE("get_all_rules");
 }
 }
 

@@ -49,7 +49,7 @@
 
     const model = editor.getModel();
     const didContentChange = model?.onDidChangeContent(() => {
-      content = model?.getLinesContent().join('\n') ?? '';
+      content = model?.getValue() ?? '';
     });
 
     return () => {

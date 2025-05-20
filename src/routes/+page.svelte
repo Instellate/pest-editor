@@ -10,7 +10,9 @@
   import { Pane, Splitpanes } from 'svelte-splitpanes';
   import ArrowDropdown from '$lib/ArrowDropdown.svelte';
 
-  initializePest();
+  if (monaco.languages.getEncodedLanguageId('pest-rs') === 0) {
+    initializePest();
+  }
 
   let leftPanel: monaco.editor.IStandaloneCodeEditor | undefined = $state(undefined);
   let rightPanel: monaco.editor.IStandaloneCodeEditor | undefined = $state(undefined);
@@ -79,8 +81,8 @@
 
         if (v.data) {
           const labelCount = new Map<string, number>();
-
           const [_, newData] = createData(v.data, labelCount);
+
           networkData = newData;
         } else {
           networkData = {};
@@ -122,6 +124,7 @@
         color: '#FFFFFF',
       },
     };
+    data.nodes.push(node);
 
     const children = tree.children.map((c) => createData(c, labelCount));
     for (const [childNode, child] of children) {
@@ -133,8 +136,6 @@
         to: childNode.id,
       });
     }
-    data.nodes.push(node);
-
     return [node, data];
   }
 
@@ -198,6 +199,14 @@
           layout: {
             hierarchical: {
               direction: 'UD',
+              sortMethod: 'directed',
+              shakeTowards: 'roots',
+            },
+          },
+
+          physics: {
+            hierarchicalRepulsion: {
+              nodeDistance: 200,
             },
           },
         }}
