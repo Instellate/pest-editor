@@ -1,0 +1,55 @@
+name: Build
+
+on:
+  push:
+    branches: ['main']
+
+jobs:
+  x86_64:
+    strategy:
+      matrix:
+        include:
+          - platform: ubuntu-latest
+            args: ''
+          - platform: windows-latest
+            args: ''
+          # - platform: macos-latest
+          #   args: --target universal-apple-darwin
+
+    runs-on: ${{ matrix.platform }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        name: Setup Node
+        with:
+          node-version: '22.x'
+
+      - name: Setup Rust
+        run: sh <(curl https://sh.rustup.rs) -y ${{ matrix.platform == 'macos-latest' && '--target aarch64-apple-darwin,x86_64-apple-darwin' || '' }} && echo "$HOME/.cargo/bin" >> $GITHUB_PATH
+
+      - name: Install needed dependencies
+        if: matrix.platform == 'ubuntu-latest'
+        run: |
+          sudo apt update
+          sudo apt install -y libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf xdg-utils
+
+      - name: Setup pnpm
+        run: |
+          corepack install
+          corepack enable
+
+      - name: Install pnpm dependencies
+        run: pnpm i --frozen-lockfile
+
+      - name: Build project
+        run: pnpm tauri build ${{ matrix.args }}
+
+      - name: Upload Linux Artifacts
+        uses: actions/upload-artifact@v4
+        if: matrix.platform == 'ubuntu-latest'
+        with:
+          path: |
+            src-tauri/target/release/bundle/deb/Pest Editor_*.deb
+            src-tauri/target/release/bundle/rpm/Pest Editor-*.rpm
+            src-tauri/target/release/bundle/appimage/Pest Editor_*.AppImage

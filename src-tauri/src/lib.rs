@@ -62,22 +62,18 @@ pub fn run() {
             builder.mount_events(app);
             register_menu(app)?;
 
-            let mut args = std::env::args().skip(1);
-            let file = loop {
-                let Some(arg) = args.next() else {
-                    break None;
-                };
-
-                if !arg.starts_with("-") {
-                    break Some(arg);
+            let args = std::env::args().skip(1);
+            for arg in args {
+                if arg.starts_with("-") {
+                    continue;
                 }
-            };
-            if let Some(file) = file {
-                let path = std::path::Path::new(&file);
+
+                let path = std::path::Path::new(&arg);
                 if path.exists() {
                     let state_store = app.store("state.json")?;
-                    state_store.set("last-file", file);
-                } 
+                    state_store.set("last-file", arg);
+                }
+                break;
             }
 
             Ok(())
