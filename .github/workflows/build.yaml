@@ -28,7 +28,7 @@ jobs:
       - uses: dtolnay/rust-toolchain@stable
         name: Setup Rust
         with:
-          targets: ${{ matrix.platform == 'macos-latest' && '--target aarch64-apple-darwin,x86_64-apple-darwin' || '' }}
+          targets: ${{ matrix.platform == 'macos-latest' && 'aarch64-apple-darwin,x86_64-apple-darwin' || '' }}
 
       - name: Install needed dependencies
         if: matrix.platform == 'ubuntu-latest'
