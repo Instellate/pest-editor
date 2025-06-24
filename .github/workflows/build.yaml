@@ -67,6 +67,6 @@ jobs:
         if: matrix.platform == 'windows-latest'
         with:
           path: |
-            src-tauri\target\release\bundle\nsis\Pest Editor_*.exe
-            src-tauri\target\release\bundle\msi\Pest Editor_*.msi
+            src-tauri/target/release/bundle/nsis/Pest Editor_*.exe
+            src-tauri/target/release/bundle/msi/Pest Editor_*.msi
         
