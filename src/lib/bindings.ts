@@ -26,12 +26,52 @@ async findRuleReferences(ruleName: string) : Promise<Location[] | null> {
 },
 async getAllRules() : Promise<string[]> {
     return await TAURI_INVOKE("get_all_rules");
+},
+async updateGrammarContent(content: string) : Promise<Result<null, string>> {
+    try {
+    return { status: "ok", data: await TAURI_INVOKE("update_grammar_content", { content }) };
+} catch (e) {
+    if(e instanceof Error) throw e;
+    else return { status: "error", error: e  as any };
+}
+},
+async saveGrammarContent() : Promise<Result<null, string>> {
+    try {
+    return { status: "ok", data: await TAURI_INVOKE("save_grammar_content") };
+} catch (e) {
+    if(e instanceof Error) throw e;
+    else return { status: "error", error: e  as any };
+}
+},
+async updateGrammarInput(content: string) : Promise<Result<null, string>> {
+    try {
+    return { status: "ok", data: await TAURI_INVOKE("update_grammar_input", { content }) };
+} catch (e) {
+    if(e instanceof Error) throw e;
+    else return { status: "error", error: e  as any };
+}
+},
+async saveGrammarInput() : Promise<Result<null, string>> {
+    try {
+    return { status: "ok", data: await TAURI_INVOKE("save_grammar_input") };
+} catch (e) {
+    if(e instanceof Error) throw e;
+    else return { status: "error", error: e  as any };
+}
+},
+async changeFile(path: string) : Promise<void> {
+    await TAURI_INVOKE("change_file", { path });
 }
 }
 
 /** user-defined events **/
 
 
+export const events = __makeEvents__<{
+changeFileEvent: ChangeFileEvent
+}>({
+changeFileEvent: "change-file-event"
+})
 
 /** user-defined constants **/
 
@@ -39,6 +79,7 @@ async getAllRules() : Promise<string[]> {
 
 /** user-defined types **/
 
+export type ChangeFileEvent = { grammar: string; input: string }
 export type Location = { start_line: number; start_col: number; end_line: number; end_col: number }
 export type PestGrammarError = { message: string; location: Location }
 export type TokenTree = { label: string; children: TokenTree[] }

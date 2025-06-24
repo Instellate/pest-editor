@@ -11,7 +11,14 @@
     "dialog:default",
     "store:default",
     "clipboard-manager:allow-read-text",
-    "clipboard-manager:allow-write-text"
+    "clipboard-manager:allow-write-text",
+    "fs:read-files",
+    "fs:write-files",
+    "log:default"
   ],
-  "platforms": ["linux", "macOS", "windows"]
+  "platforms": [
+    "linux",
+    "macOS",
+    "windows"
+  ]
 }

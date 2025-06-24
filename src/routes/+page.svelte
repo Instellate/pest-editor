@@ -1,6 +1,6 @@
 <script lang="ts">
   import '../editor.scss';
-  import { commands, type TokenTree } from '$lib/bindings';
+  import { commands, events, type TokenTree } from '$lib/bindings';
   import { initializePest } from '$lib/monaco-pest';
   import Editor from '$lib/Editor.svelte';
   import Network from '$lib/Network.svelte';
@@ -9,9 +9,30 @@
   import { type Edge, type Data as VisData, type Node } from 'vis-network';
   import { Pane, Splitpanes } from 'svelte-splitpanes';
   import ArrowDropdown from '$lib/ArrowDropdown.svelte';
+  import { getCurrentWebviewWindow } from '@tauri-apps/api/webviewWindow';
+  import { trace } from '@tauri-apps/plugin-log';
+  import { load } from '@tauri-apps/plugin-store';
 
   if (monaco.languages.getEncodedLanguageId('pest-rs') === 0) {
     initializePest();
+
+    const saveGrammar = debounce(commands.saveGrammarContent, 250);
+    const saveInput = debounce(commands.saveGrammarInput, 250);
+
+    monaco.editor.addEditorAction({
+      id: 'save',
+      label: 'Save file',
+      keybindings: [monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyS],
+      run: async (editor) => {
+        if (leftPanel?.getId() === editor.getId()) {
+          trace('Saving grammar');
+          await saveGrammar();
+        } else if (rightPanel?.getId() === editor.getId()) {
+          trace('Saving input');
+          await saveInput();
+        }
+      },
+    });
   }
 
   let leftPanel: monaco.editor.IStandaloneCodeEditor | undefined = $state(undefined);
@@ -55,7 +76,8 @@
         ++grammarUpdate;
       }
     });
-  }, 500);
+    commands.updateGrammarContent(grammar);
+  }, 250);
 
   const parseInput = debounce((input: string, rule: string, _: number) => {
     commands.parseInput(input, rule).then((v) => {
@@ -90,6 +112,8 @@
       }
     });
   }, 250);
+
+  const updateInput = debounce(commands.updateGrammarInput, 250);
 
   interface FormattedData extends VisData {
     edges: Edge[];
@@ -144,11 +168,39 @@
   });
 
   $effect(() => {
+    updateInput(input);
+  });
+
+  $effect(() => {
     if (!selectedRule) {
       return;
     }
 
     parseInput(input, selectedRule, grammarUpdate);
+  });
+
+  $effect(() => {
+    let window = getCurrentWebviewWindow();
+    const listener = events.changeFileEvent(window).listen((e) => {
+      leftPanel?.setValue(e.payload.grammar);
+      rightPanel?.setValue(e.payload.input);
+    });
+
+    return async () => {
+      trace('Detaching change file listener');
+      (await listener)();
+    };
+  });
+
+  $effect(() => {
+    (async () => {
+      const store = await load('state.json', { autoSave: false });
+  
+      const lastFile = await store.get('last-file');
+      if (typeof lastFile === 'string') {
+        commands.changeFile(lastFile);
+      }
+    })();
   });
 </script>
 

@@ -1,5 +1,4 @@
 import * as monaco from 'monaco-editor';
-import debounce from 'lodash.debounce';
 import { commands } from './bindings';
 
 const pestId = 'pest-rs';
@@ -222,12 +221,14 @@ export function initializePest() {
       { open: '(', close: ')' },
       { open: '[', close: ']' },
       { open: '"', close: '"' },
+      { open: "'", close: "'" }
     ],
     autoClosingPairs: [
       { open: '{', close: '}' },
       { open: '[', close: ']' },
       { open: '(', close: ')' },
       { open: "'", close: "'", notIn: ['string', 'comment'] },
+      { open: '"', close: '"', notIn: ['string', 'comment'] },
     ],
     brackets: [
       ['{', '}'],
@@ -327,7 +328,7 @@ export function initializePest() {
       return { edits };
     },
 
-    resolveRenameLocation: async (model, position, token) => {
+    resolveRenameLocation: async (model, position) => {
       const word = model.getWordAtPosition(position);
 
       if (!word) {
