@@ -55,12 +55,14 @@ jobs:
             src-tauri/target/release/bundle/deb/Pest Editor_*.deb
             src-tauri/target/release/bundle/rpm/Pest Editor-*.rpm
             src-tauri/target/release/bundle/appimage/Pest Editor_*.AppImage
+          name: linux
 
       - name: Upload MacOs Artifacts
         uses: actions/upload-artifact@v4
         if: matrix.platform == 'macos-latest'
         with:
           path: src-tauri/target/universal-apple-darwin/release/bundle/dmg/Pest Editor_*.dmg
+          name: macos
       
       - name: Upload Windows Artifacts
         uses: actions/upload-artifact@v4
@@ -69,4 +71,5 @@ jobs:
           path: |
             src-tauri/target/release/bundle/nsis/Pest Editor_*.exe
             src-tauri/target/release/bundle/msi/Pest Editor_*.msi
+          name: windows
         
