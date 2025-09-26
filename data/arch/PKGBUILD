@@ -9,8 +9,10 @@ license=('MIT')
 depends=('gdk-pixbuf2' 'glibc' 'gtk3' 'cairo' 'libsoup3' 'gcc-libs' 'glib2' 'pango' 'hicolor-icon-theme' 'webkit2gtk-4.1')
 options=('!lto' '!strip' '!emptydirs')
 makedepends=('cargo' 'appmenu-gtk-module' 'libappindicator-gtk3' 'librsvg' 'pnpm' 'nodejs' 'git')
-source=("git+https://github.com/Instellate/pest-editor.git")
-b2sums=('SKIP')
+source=('git+https://github.com/Instellate/pest-editor.git' 'pest-editor.xml')
+b2sums=('SKIP'
+        '30e0b898f76743202fb61e269501861d29ae87db63655ad2aad45a1eef6f07482f6655f9f7a88b5ed1f3a7e9642ca65a037ada3372b730524ea2c5898dc0ab49')
+install="${pkgname}.install"
 
 build() {
     cd "${srcdir}/pest-editor"
@@ -21,4 +23,7 @@ build() {
 package() {
     cp -r -a -T "${srcdir}/pest-editor/src-tauri/target/release/bundle/deb/Pest Editor_${pkgver}"_*/data ${pkgdir}
     install -Dm644 "${srcdir}/pest-editor/LICENSE" "${pkgdir}/usr/share/licenses/${pkgname}/LICENSE"
+
+    mkdir -p "${pkgdir}/usr/share/mime/packages"
+    cp "${srcdir}/pest-editor.xml" "${pkgdir}/usr/share/mime/packages/pest-editor.xml"
 }

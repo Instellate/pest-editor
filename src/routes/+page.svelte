@@ -103,7 +103,10 @@
 
         if (v.data) {
           const labelCount = new Map<string, number>();
-          const [_, newData] = createData(v.data, labelCount);
+          const [_, newData] = createData(
+            v.data.children.length > 0 ? v.data.children[0] : v.data,
+            labelCount,
+          );
 
           networkData = newData;
         } else {
@@ -195,7 +198,7 @@
   $effect(() => {
     (async () => {
       const store = await load('state.json', { autoSave: false });
-  
+
       const lastFile = await store.get('last-file');
       if (typeof lastFile === 'string') {
         commands.changeFile(lastFile);

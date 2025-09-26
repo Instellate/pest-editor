@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<mime-info xmlns="http://www.freedesktop.org/standards/shared-mime-info">
+    <mime-type type="application/x-pest">
+        <sub-class-of type="text/plain"/>
+        <comment>Pest Grammar filee</comment>
+        <glob pattern="*.pest"/>
+    </mime-type>
+</mime-info>

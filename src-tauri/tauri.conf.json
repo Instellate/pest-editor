@@ -36,13 +36,18 @@
       "icons/icon.icns",
       "icons/icon.ico"
     ],
+    "linux": {
+      "deb": {
+        "files": {}
+      }
+    },
     "fileAssociations": [
       {
         "ext": [
           "pest"
         ],
         "description": "Pest grammar files",
-        "mimeType": "text/plain",
+        "mimeType": "application/x-pest",
         "role": "Editor"
       }
     ]
